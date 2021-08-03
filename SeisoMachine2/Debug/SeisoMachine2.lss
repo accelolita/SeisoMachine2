@@ -116,8 +116,8 @@ int main(void)
 	OCR0A=255;
   96:	8f ef       	ldi	r24, 0xFF	; 255
   98:	87 bd       	out	0x27, r24	; 39
-	OCR0B=255;
-  9a:	88 bd       	out	0x28, r24	; 40
+	OCR0B=0;
+  9a:	18 bc       	out	0x28, r1	; 40
   9c:	ff cf       	rjmp	.-2      	; 0x9c <main+0x1c>
 
 0000009e <_exit>:

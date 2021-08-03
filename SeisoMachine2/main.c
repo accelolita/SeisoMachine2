@@ -61,7 +61,7 @@ int main(void)
 	TCCR0B= (0<<WGM02) //‚‘¬PWM
 	| (0b100<<CS00); //256•ªŽü@312.5Hz
 	OCR0A=255;
-	OCR0B=255;
+	OCR0B=0;
 	
 	
 	//PORTB|=0b00000000;
