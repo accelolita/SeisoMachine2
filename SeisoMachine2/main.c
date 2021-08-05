@@ -6,10 +6,10 @@
  */ 
 
 #define	F_CPU	8000000UL		// CKSEL[1:0]=10, CKDIV8=0
-#define _BV(x) 1<<x
-#define loop_until_bit_is_set(sfr,bit) do { } while (!(sfr & _BV(bit)))
-#define loop_until_bit_is_clear(sfr,bit) do { } while ((sfr & _BV(bit)))
-	
+
+#define sbi(a,b) a|=1<<b;
+#define cbi(a,b) a&=~(1<<b);
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -68,10 +68,53 @@ int main(void)
 	TCCR1B= (0b00<<WGM12)   //8bit高速PWM
 	| (0b100<<CS10);		//256分周　312.5Hz
 	OCR1A=0;
+	//8bitタイマーカウンタ2
+	TCCR2A= (0b0000<<COM2B0)//標準ポート動作
+	| (0b10<<WGM20);		//比較一致ﾀｲﾏ
+	TCCR2B= (0b1<<WGM22)	//比較一致ﾀｲﾏ
+	| (0b111<<CS20);		//1024分周　78.125Hz
+	OCR2A=40;
+	TIMSK2=1<<OCIE2A;		//タイマー2A割込み許可
 	
 	//PORTB|=0b00000000;
+	
+	sei();
     while (1) 
     {
     }
 }
 
+
+ISR(TIMER2_COMPA_vect)
+{
+	static unsigned char digit=0;
+	//全部クリア
+	cbi(PORTD,PD7);
+	cbi(PORTB,PB7);
+	cbi(PORTB,PB6);
+	cbi(PORTD,PD4);
+	//特定桁の表示
+	switch (digit)
+	{
+		case 0:
+		sbi(PORTD,PD7);
+		break;
+		case 1:
+		sbi(PORTB,PB7);
+		break;
+		case 2:
+		sbi(PORTB,PB6);
+		break;
+		case 3:
+		sbi(PORTD,PD4);
+		break;
+		default:
+		/* Your code here */
+		break;
+	}
+	digit++;
+	if (digit>3)
+	{
+		digit=0;
+	}
+}
