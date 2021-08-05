@@ -53,16 +53,21 @@ int main(void)
 	
 	PORTD|=0b10000000;
 	
-	//8bitタイマーカウンタ０
-	//PWM
-	TCCR0A= (0b11<<COM0A0)	//高速PWM比較A反転出力
+	//8bitタイマーカウンタ０//PWM
+	TCCR0A= (0b11<<COM1A0)	//高速PWM比較A反転出力
 	| (0b11<<COM0B0)		//高速PWM比較B反転出力
 	| (0b11<<WGM00);  		//高速PWM
 	TCCR0B= (0<<WGM02) //高速PWM
 	| (0b100<<CS00); //256分周　312.5Hz
-	OCR0A=255;
-	OCR0B=0;
-	
+	OCR0A=0;
+	OCR0B=255;
+	//16bitタイマーカウンタ1
+	TCCR1A= (0b11<<COM0A0)	//高速PWM比較A反転出力
+	| (0b00<<COM0B0)		//標準ポート動作
+	| (0b01<<WGM00);  		//8bit高速PWM	
+	TCCR1B= (0b00<<WGM12)   //8bit高速PWM
+	| (0b100<<CS10);		//256分周　312.5Hz
+	OCR1A=0;
 	
 	//PORTB|=0b00000000;
     while (1) 
