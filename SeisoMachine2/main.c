@@ -9,6 +9,8 @@
 
 #define sbi(a,b) a|=1<<b;
 #define cbi(a,b) a&=~(1<<b);
+#define roopup(a,b,c) a= a<c ? a+1 : b 
+#define roopdown(a,b,c) a= a>c ? a-1 : b
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -18,6 +20,7 @@
 
 #define PlaySound(x) dfCommand[6]=x;SendCommand(&dfCommand[0],(unsigned char)0x08);
 
+void Set7Seg(unsigned char num,unsigned char dot);
 
 int main(void)
 {
@@ -59,24 +62,35 @@ int main(void)
 	| (0b11<<WGM00);  		//高速PWM
 	TCCR0B= (0<<WGM02) //高速PWM
 	| (0b100<<CS00); //256分周　312.5Hz
-	OCR0A=0;
-	OCR0B=255;
+
 	//16bitタイマーカウンタ1
 	TCCR1A= (0b11<<COM0A0)	//高速PWM比較A反転出力
 	| (0b00<<COM0B0)		//標準ポート動作
 	| (0b01<<WGM00);  		//8bit高速PWM	
 	TCCR1B= (0b00<<WGM12)   //8bit高速PWM
 	| (0b100<<CS10);		//256分周　312.5Hz
-	OCR1A=0;
+
 	//8bitタイマーカウンタ2
 	TCCR2A= (0b0000<<COM2B0)//標準ポート動作
 	| (0b10<<WGM20);		//比較一致ﾀｲﾏ
 	TCCR2B= (0b1<<WGM22)	//比較一致ﾀｲﾏ
 	| (0b111<<CS20);		//1024分周　78.125Hz
-	OCR2A=40;
+	OCR2A=40;				//ダイナミック点灯周期
+	OCR2B=0xFF;				//ロータリーエンコーダーゲーミング周期
 	TIMSK2=1<<OCIE2A;		//タイマー2A割込み許可
-	
 	//PORTB|=0b00000000;
+	
+	//外部割込み
+	EICRA= 0b01<<ISC10		//INT1 両端割込み
+	| 0b01<<ISC00;			//INT0 両端割込み
+	EIMSK=1<<INT0			//INT0 割込み許可
+	| 0b01<<INT1;				//INT1 割込み許可
+			
+		
+	//ゲーミングロータリーエンコーダ初期設定
+	OCR0A=0;
+	OCR0B=255;
+	OCR1A=0;
 	
 	sei();
     while (1) 
@@ -84,6 +98,10 @@ int main(void)
     }
 }
 
+void Set7Seg(unsigned char num,unsigned char dot)
+{
+
+}
 
 ISR(TIMER2_COMPA_vect)
 {
@@ -112,9 +130,54 @@ ISR(TIMER2_COMPA_vect)
 		/* Your code here */
 		break;
 	}
-	digit++;
-	if (digit>3)
+	roopup(digit,0,3);
+	
+	//ゲーミングロータリーエンコーダ
+	static unsigned char stage=0;
+	if (stage==0)
 	{
-		digit=0;
+		OCR0B--;
+		OCR1A++;
+		if (OCR0B==0) 
+		{
+			OCR0A=0;
+			OCR0B=0;
+			OCR1A=255;			
+			stage=1;			
+		}
 	}
+	else if (stage==1)
+	{
+		OCR1A--;
+		OCR0A++;
+		if (OCR1A==0) 
+		{
+			OCR0A=255;
+			OCR0B=0;
+			OCR1A=0;
+			stage=2;
+		}
+	}
+	else if (stage==2)
+	{
+		OCR0A--;
+		OCR0B++;
+		if (OCR0A==0) 
+		{
+			OCR0A=0;
+			OCR0B=255;
+			OCR1A=0;
+			stage=0;
+		}
+	}
+}
+
+ISR(INT0_vect)
+{
+	
+}
+
+ISR(INT1_vect)
+{
+	
 }

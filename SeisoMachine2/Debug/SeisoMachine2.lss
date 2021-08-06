@@ -3,44 +3,44 @@ SeisoMachine2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000001a6  2**0
+  0 .data         00000000  00800100  00800100  0000027e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000132  00000000  00000000  00000074  2**1
+  1 .text         0000020a  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800100  00800100  000001a6  2**0
+  2 .bss          00000002  00800100  00800100  0000027e  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000001a6  2**0
+  3 .comment      00000030  00000000  00000000  0000027e  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001d8  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000002b0  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000028  00000000  00000000  00000218  2**0
+  5 .debug_aranges 00000040  00000000  00000000  000002f0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000006af  00000000  00000000  00000240  2**0
+  6 .debug_info   00000725  00000000  00000000  00000330  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000061f  00000000  00000000  000008ef  2**0
+  7 .debug_abbrev 00000662  00000000  00000000  00000a55  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000002a5  00000000  00000000  00000f0e  2**0
+  8 .debug_line   0000039a  00000000  00000000  000010b7  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000044  00000000  00000000  000011b4  2**2
+  9 .debug_frame  0000009c  00000000  00000000  00001454  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000036b  00000000  00000000  000011f8  2**0
+ 10 .debug_str    0000038f  00000000  00000000  000014f0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000003c  00000000  00000000  00001563  2**0
+ 11 .debug_loc    000000c1  00000000  00000000  0000187f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000018  00000000  00000000  0000159f  2**0
+ 12 .debug_ranges 00000030  00000000  00000000  00001940  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
 
 00000000 <__vectors>:
    0:	0c 94 34 00 	jmp	0x68	; 0x68 <__ctors_end>
-   4:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
-   8:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
+   4:	0c 94 ef 00 	jmp	0x1de	; 0x1de <__vector_1>
+   8:	0c 94 f9 00 	jmp	0x1f2	; 0x1f2 <__vector_2>
    c:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   10:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   14:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   18:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
-  1c:	0c 94 6c 00 	jmp	0xd8	; 0xd8 <__vector_7>
+  1c:	0c 94 73 00 	jmp	0xe6	; 0xe6 <__vector_7>
   20:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   24:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
   28:	0c 94 46 00 	jmp	0x8c	; 0x8c <__bad_interrupt>
@@ -78,183 +78,275 @@ Disassembly of section .text:
   7c:	1d 92       	st	X+, r1
 
 0000007e <.do_clear_bss_start>:
-  7e:	a1 30       	cpi	r26, 0x01	; 1
+  7e:	a2 30       	cpi	r26, 0x02	; 2
   80:	b2 07       	cpc	r27, r18
   82:	e1 f7       	brne	.-8      	; 0x7c <.do_clear_bss_loop>
   84:	0e 94 48 00 	call	0x90	; 0x90 <main>
-  88:	0c 94 97 00 	jmp	0x12e	; 0x12e <_exit>
+  88:	0c 94 03 01 	jmp	0x206	; 0x206 <_exit>
 
 0000008c <__bad_interrupt>:
   8c:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000090 <main>:
-
-int main(void)
-{
-
-	//ポートB　2 3 GP F 青 G　
-	DDRB= 
-  90:	8f ec       	ldi	r24, 0xCF	; 207
-  92:	84 b9       	out	0x04, r24	; 4
-	| (1<<DDB3) //PB3 MOSI 7seg_GP
-	| (1<<DDB2) //PB2 7seg_F
-	| (1<<DDB1) //PB1 blue
-	| (1<<DDB0);//PB0 7seg_G
-	//ポートC　E D C B A スイッチ
-	DDRC=
-  94:	8e e3       	ldi	r24, 0x3E	; 62
-  96:	87 b9       	out	0x07, r24	; 7
-	| (1<<DDC3) //PC3 7seg_C
-	| (1<<DDC2) //PC2 7seg_B
-	| (1<<DDC1) //PC1 7seg_A
-	| (0<<DDC0);//PC0 switch
-	//ポートD　1 緑 赤 4 INT INT TX RX
-	DDRD=
-  98:	80 ef       	ldi	r24, 0xF0	; 240
-  9a:	8a b9       	out	0x0a, r24	; 10
-	| (0<<DDD3) //PD3 INT1 rotary encoder
-	| (0<<DDD2) //PD2 INT2 rotary encoder
-	| (0<<DDD1) //PD1 UART TX
-	| (0<<DDD0);//PD0 UART RX
-	
-	PORTD|=0b10000000;
-  9c:	5f 9a       	sbi	0x0b, 7	; 11
-	
-	//8bitタイマーカウンタ０//PWM
-	TCCR0A= (0b11<<COM1A0)	//高速PWM比較A反転出力
-  9e:	83 ef       	ldi	r24, 0xF3	; 243
-  a0:	84 bd       	out	0x24, r24	; 36
-	| (0b11<<COM0B0)		//高速PWM比較B反転出力
-	| (0b11<<WGM00);  		//高速PWM
-	TCCR0B= (0<<WGM02) //高速PWM
-  a2:	84 e0       	ldi	r24, 0x04	; 4
-  a4:	85 bd       	out	0x25, r24	; 37
-	| (0b100<<CS00); //256分周　312.5Hz
-	OCR0A=0;
-  a6:	17 bc       	out	0x27, r1	; 39
-	OCR0B=255;
-  a8:	9f ef       	ldi	r25, 0xFF	; 255
-  aa:	98 bd       	out	0x28, r25	; 40
-	//16bitタイマーカウンタ1
-	TCCR1A= (0b11<<COM0A0)	//高速PWM比較A反転出力
-  ac:	91 ec       	ldi	r25, 0xC1	; 193
-  ae:	90 93 80 00 	sts	0x0080, r25	; 0x800080 <__DATA_REGION_ORIGIN__+0x20>
-	| (0b00<<COM0B0)		//標準ポート動作
-	| (0b01<<WGM00);  		//8bit高速PWM	
-	TCCR1B= (0b00<<WGM12)   //8bit高速PWM
-  b2:	80 93 81 00 	sts	0x0081, r24	; 0x800081 <__DATA_REGION_ORIGIN__+0x21>
-	| (0b100<<CS10);		//256分周　312.5Hz
-	OCR1A=0;
-  b6:	10 92 89 00 	sts	0x0089, r1	; 0x800089 <__DATA_REGION_ORIGIN__+0x29>
-  ba:	10 92 88 00 	sts	0x0088, r1	; 0x800088 <__DATA_REGION_ORIGIN__+0x28>
-	//8bitタイマーカウンタ2
-	TCCR2A= (0b0000<<COM2B0)//標準ポート動作
-  be:	82 e0       	ldi	r24, 0x02	; 2
-  c0:	80 93 b0 00 	sts	0x00B0, r24	; 0x8000b0 <__DATA_REGION_ORIGIN__+0x50>
-	| (0b10<<WGM20);		//比較一致ﾀｲﾏ
-	TCCR2B= (0b1<<WGM22)	//比較一致ﾀｲﾏ
-  c4:	9f e0       	ldi	r25, 0x0F	; 15
-  c6:	90 93 b1 00 	sts	0x00B1, r25	; 0x8000b1 <__DATA_REGION_ORIGIN__+0x51>
-	| (0b111<<CS20);		//1024分周　78.125Hz
-	OCR2A=40;
-  ca:	98 e2       	ldi	r25, 0x28	; 40
-  cc:	90 93 b3 00 	sts	0x00B3, r25	; 0x8000b3 <__DATA_REGION_ORIGIN__+0x53>
-	TIMSK2=1<<OCIE2A;		//タイマー2A割込み許可
-  d0:	80 93 70 00 	sts	0x0070, r24	; 0x800070 <__DATA_REGION_ORIGIN__+0x10>
-	
-	//PORTB|=0b00000000;
-	
-	sei();
-  d4:	78 94       	sei
-  d6:	ff cf       	rjmp	.-2      	; 0xd6 <main+0x46>
-
-000000d8 <__vector_7>:
+    {
     }
 }
 
+void Set7Seg(unsigned char num,unsigned char dot)
+{
+  90:	8f ec       	ldi	r24, 0xCF	; 207
+  92:	84 b9       	out	0x04, r24	; 4
+  94:	8e e3       	ldi	r24, 0x3E	; 62
+  96:	87 b9       	out	0x07, r24	; 7
+  98:	80 ef       	ldi	r24, 0xF0	; 240
+  9a:	8a b9       	out	0x0a, r24	; 10
+  9c:	5f 9a       	sbi	0x0b, 7	; 11
+  9e:	83 ef       	ldi	r24, 0xF3	; 243
+  a0:	84 bd       	out	0x24, r24	; 36
+  a2:	84 e0       	ldi	r24, 0x04	; 4
+  a4:	85 bd       	out	0x25, r24	; 37
+  a6:	91 ec       	ldi	r25, 0xC1	; 193
+  a8:	90 93 80 00 	sts	0x0080, r25	; 0x800080 <__DATA_REGION_ORIGIN__+0x20>
+  ac:	80 93 81 00 	sts	0x0081, r24	; 0x800081 <__DATA_REGION_ORIGIN__+0x21>
+  b0:	92 e0       	ldi	r25, 0x02	; 2
+  b2:	90 93 b0 00 	sts	0x00B0, r25	; 0x8000b0 <__DATA_REGION_ORIGIN__+0x50>
+  b6:	8f e0       	ldi	r24, 0x0F	; 15
+  b8:	80 93 b1 00 	sts	0x00B1, r24	; 0x8000b1 <__DATA_REGION_ORIGIN__+0x51>
+  bc:	88 e2       	ldi	r24, 0x28	; 40
+  be:	80 93 b3 00 	sts	0x00B3, r24	; 0x8000b3 <__DATA_REGION_ORIGIN__+0x53>
+  c2:	8f ef       	ldi	r24, 0xFF	; 255
+  c4:	80 93 b4 00 	sts	0x00B4, r24	; 0x8000b4 <__DATA_REGION_ORIGIN__+0x54>
+  c8:	90 93 70 00 	sts	0x0070, r25	; 0x800070 <__DATA_REGION_ORIGIN__+0x10>
+  cc:	95 e0       	ldi	r25, 0x05	; 5
+  ce:	90 93 69 00 	sts	0x0069, r25	; 0x800069 <__DATA_REGION_ORIGIN__+0x9>
+  d2:	93 e0       	ldi	r25, 0x03	; 3
+  d4:	9d bb       	out	0x1d, r25	; 29
+  d6:	17 bc       	out	0x27, r1	; 39
+  d8:	88 bd       	out	0x28, r24	; 40
+  da:	10 92 89 00 	sts	0x0089, r1	; 0x800089 <__DATA_REGION_ORIGIN__+0x29>
+  de:	10 92 88 00 	sts	0x0088, r1	; 0x800088 <__DATA_REGION_ORIGIN__+0x28>
+  e2:	78 94       	sei
+  e4:	ff cf       	rjmp	.-2      	; 0xe4 <main+0x54>
+
+000000e6 <__vector_7>:
+
+}
 
 ISR(TIMER2_COMPA_vect)
 {
-  d8:	1f 92       	push	r1
-  da:	0f 92       	push	r0
-  dc:	0f b6       	in	r0, 0x3f	; 63
-  de:	0f 92       	push	r0
-  e0:	11 24       	eor	r1, r1
-  e2:	8f 93       	push	r24
+  e6:	1f 92       	push	r1
+  e8:	0f 92       	push	r0
+  ea:	0f b6       	in	r0, 0x3f	; 63
+  ec:	0f 92       	push	r0
+  ee:	11 24       	eor	r1, r1
+  f0:	8f 93       	push	r24
+  f2:	9f 93       	push	r25
+  f4:	ef 93       	push	r30
+  f6:	ff 93       	push	r31
 	static unsigned char digit=0;
 	//全部クリア
 	cbi(PORTD,PD7);
-  e4:	5f 98       	cbi	0x0b, 7	; 11
+  f8:	5f 98       	cbi	0x0b, 7	; 11
 	cbi(PORTB,PB7);
-  e6:	2f 98       	cbi	0x05, 7	; 5
+  fa:	2f 98       	cbi	0x05, 7	; 5
 	cbi(PORTB,PB6);
-  e8:	2e 98       	cbi	0x05, 6	; 5
+  fc:	2e 98       	cbi	0x05, 6	; 5
 	cbi(PORTD,PD4);
-  ea:	5c 98       	cbi	0x0b, 4	; 11
+  fe:	5c 98       	cbi	0x0b, 4	; 11
 	//特定桁の表示
 	switch (digit)
-  ec:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
-  f0:	81 30       	cpi	r24, 0x01	; 1
-  f2:	41 f0       	breq	.+16     	; 0x104 <__vector_7+0x2c>
-  f4:	28 f0       	brcs	.+10     	; 0x100 <__vector_7+0x28>
-  f6:	82 30       	cpi	r24, 0x02	; 2
-  f8:	39 f0       	breq	.+14     	; 0x108 <__vector_7+0x30>
-  fa:	83 30       	cpi	r24, 0x03	; 3
-  fc:	39 f0       	breq	.+14     	; 0x10c <__vector_7+0x34>
-  fe:	07 c0       	rjmp	.+14     	; 0x10e <__vector_7+0x36>
+ 100:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <digit.1744>
+ 104:	81 30       	cpi	r24, 0x01	; 1
+ 106:	41 f0       	breq	.+16     	; 0x118 <__vector_7+0x32>
+ 108:	28 f0       	brcs	.+10     	; 0x114 <__vector_7+0x2e>
+ 10a:	82 30       	cpi	r24, 0x02	; 2
+ 10c:	39 f0       	breq	.+14     	; 0x11c <__vector_7+0x36>
+ 10e:	83 30       	cpi	r24, 0x03	; 3
+ 110:	39 f0       	breq	.+14     	; 0x120 <__vector_7+0x3a>
+ 112:	07 c0       	rjmp	.+14     	; 0x122 <__vector_7+0x3c>
 	{
 		case 0:
 		sbi(PORTD,PD7);
- 100:	5f 9a       	sbi	0x0b, 7	; 11
+ 114:	5f 9a       	sbi	0x0b, 7	; 11
 		break;
- 102:	05 c0       	rjmp	.+10     	; 0x10e <__vector_7+0x36>
+ 116:	05 c0       	rjmp	.+10     	; 0x122 <__vector_7+0x3c>
 		case 1:
 		sbi(PORTB,PB7);
- 104:	2f 9a       	sbi	0x05, 7	; 5
+ 118:	2f 9a       	sbi	0x05, 7	; 5
 		break;
- 106:	03 c0       	rjmp	.+6      	; 0x10e <__vector_7+0x36>
+ 11a:	03 c0       	rjmp	.+6      	; 0x122 <__vector_7+0x3c>
 		case 2:
 		sbi(PORTB,PB6);
- 108:	2e 9a       	sbi	0x05, 6	; 5
+ 11c:	2e 9a       	sbi	0x05, 6	; 5
 		break;
- 10a:	01 c0       	rjmp	.+2      	; 0x10e <__vector_7+0x36>
+ 11e:	01 c0       	rjmp	.+2      	; 0x122 <__vector_7+0x3c>
 		case 3:
 		sbi(PORTD,PD4);
- 10c:	5c 9a       	sbi	0x0b, 4	; 11
+ 120:	5c 9a       	sbi	0x0b, 4	; 11
 		break;
 		default:
 		/* Your code here */
 		break;
 	}
-	digit++;
- 10e:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
- 112:	8f 5f       	subi	r24, 0xFF	; 255
-	if (digit>3)
- 114:	84 30       	cpi	r24, 0x04	; 4
- 116:	18 f4       	brcc	.+6      	; 0x11e <__vector_7+0x46>
-		break;
-		default:
-		/* Your code here */
-		break;
-	}
-	digit++;
- 118:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
- 11c:	02 c0       	rjmp	.+4      	; 0x122 <__vector_7+0x4a>
-	if (digit>3)
+	roopup(digit,0,3);
+ 122:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <digit.1744>
+ 126:	83 30       	cpi	r24, 0x03	; 3
+ 128:	10 f4       	brcc	.+4      	; 0x12e <__vector_7+0x48>
+ 12a:	8f 5f       	subi	r24, 0xFF	; 255
+ 12c:	01 c0       	rjmp	.+2      	; 0x130 <__vector_7+0x4a>
+ 12e:	80 e0       	ldi	r24, 0x00	; 0
+ 130:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <digit.1744>
+	
+	//ゲーミングロータリーエンコーダ
+	static unsigned char stage=0;
+	if (stage==0)
+ 134:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
+ 138:	81 11       	cpse	r24, r1
+ 13a:	19 c0       	rjmp	.+50     	; 0x16e <__vector_7+0x88>
 	{
-		digit=0;
- 11e:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <_edata>
+		OCR0B--;
+ 13c:	88 b5       	in	r24, 0x28	; 40
+ 13e:	81 50       	subi	r24, 0x01	; 1
+ 140:	88 bd       	out	0x28, r24	; 40
+		OCR1A++;
+ 142:	e8 e8       	ldi	r30, 0x88	; 136
+ 144:	f0 e0       	ldi	r31, 0x00	; 0
+ 146:	80 81       	ld	r24, Z
+ 148:	91 81       	ldd	r25, Z+1	; 0x01
+ 14a:	01 96       	adiw	r24, 0x01	; 1
+ 14c:	91 83       	std	Z+1, r25	; 0x01
+ 14e:	80 83       	st	Z, r24
+		if (OCR0B==0) 
+ 150:	88 b5       	in	r24, 0x28	; 40
+ 152:	81 11       	cpse	r24, r1
+ 154:	3b c0       	rjmp	.+118    	; 0x1cc <__vector_7+0xe6>
+		{
+			OCR0A=0;
+ 156:	17 bc       	out	0x27, r1	; 39
+			OCR0B=0;
+ 158:	18 bc       	out	0x28, r1	; 40
+			OCR1A=255;			
+ 15a:	8f ef       	ldi	r24, 0xFF	; 255
+ 15c:	90 e0       	ldi	r25, 0x00	; 0
+ 15e:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__DATA_REGION_ORIGIN__+0x29>
+ 162:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__DATA_REGION_ORIGIN__+0x28>
+			stage=1;			
+ 166:	81 e0       	ldi	r24, 0x01	; 1
+ 168:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
+ 16c:	2f c0       	rjmp	.+94     	; 0x1cc <__vector_7+0xe6>
+		}
+	}
+	else if (stage==1)
+ 16e:	81 30       	cpi	r24, 0x01	; 1
+ 170:	c9 f4       	brne	.+50     	; 0x1a4 <__vector_7+0xbe>
+	{
+		OCR1A--;
+ 172:	e8 e8       	ldi	r30, 0x88	; 136
+ 174:	f0 e0       	ldi	r31, 0x00	; 0
+ 176:	80 81       	ld	r24, Z
+ 178:	91 81       	ldd	r25, Z+1	; 0x01
+ 17a:	01 97       	sbiw	r24, 0x01	; 1
+ 17c:	91 83       	std	Z+1, r25	; 0x01
+ 17e:	80 83       	st	Z, r24
+		OCR0A++;
+ 180:	87 b5       	in	r24, 0x27	; 39
+ 182:	8f 5f       	subi	r24, 0xFF	; 255
+ 184:	87 bd       	out	0x27, r24	; 39
+		if (OCR1A==0) 
+ 186:	80 81       	ld	r24, Z
+ 188:	91 81       	ldd	r25, Z+1	; 0x01
+ 18a:	89 2b       	or	r24, r25
+ 18c:	f9 f4       	brne	.+62     	; 0x1cc <__vector_7+0xe6>
+		{
+			OCR0A=255;
+ 18e:	8f ef       	ldi	r24, 0xFF	; 255
+ 190:	87 bd       	out	0x27, r24	; 39
+			OCR0B=0;
+ 192:	18 bc       	out	0x28, r1	; 40
+			OCR1A=0;
+ 194:	10 92 89 00 	sts	0x0089, r1	; 0x800089 <__DATA_REGION_ORIGIN__+0x29>
+ 198:	10 92 88 00 	sts	0x0088, r1	; 0x800088 <__DATA_REGION_ORIGIN__+0x28>
+			stage=2;
+ 19c:	82 e0       	ldi	r24, 0x02	; 2
+ 19e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
+ 1a2:	14 c0       	rjmp	.+40     	; 0x1cc <__vector_7+0xe6>
+		}
+	}
+	else if (stage==2)
+ 1a4:	82 30       	cpi	r24, 0x02	; 2
+ 1a6:	91 f4       	brne	.+36     	; 0x1cc <__vector_7+0xe6>
+	{
+		OCR0A--;
+ 1a8:	87 b5       	in	r24, 0x27	; 39
+ 1aa:	81 50       	subi	r24, 0x01	; 1
+ 1ac:	87 bd       	out	0x27, r24	; 39
+		OCR0B++;
+ 1ae:	88 b5       	in	r24, 0x28	; 40
+ 1b0:	8f 5f       	subi	r24, 0xFF	; 255
+ 1b2:	88 bd       	out	0x28, r24	; 40
+		if (OCR0A==0) 
+ 1b4:	87 b5       	in	r24, 0x27	; 39
+ 1b6:	81 11       	cpse	r24, r1
+ 1b8:	09 c0       	rjmp	.+18     	; 0x1cc <__vector_7+0xe6>
+		{
+			OCR0A=0;
+ 1ba:	17 bc       	out	0x27, r1	; 39
+			OCR0B=255;
+ 1bc:	8f ef       	ldi	r24, 0xFF	; 255
+ 1be:	88 bd       	out	0x28, r24	; 40
+			OCR1A=0;
+ 1c0:	10 92 89 00 	sts	0x0089, r1	; 0x800089 <__DATA_REGION_ORIGIN__+0x29>
+ 1c4:	10 92 88 00 	sts	0x0088, r1	; 0x800088 <__DATA_REGION_ORIGIN__+0x28>
+			stage=0;
+ 1c8:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <_edata>
+		}
 	}
 }
- 122:	8f 91       	pop	r24
- 124:	0f 90       	pop	r0
- 126:	0f be       	out	0x3f, r0	; 63
- 128:	0f 90       	pop	r0
- 12a:	1f 90       	pop	r1
- 12c:	18 95       	reti
+ 1cc:	ff 91       	pop	r31
+ 1ce:	ef 91       	pop	r30
+ 1d0:	9f 91       	pop	r25
+ 1d2:	8f 91       	pop	r24
+ 1d4:	0f 90       	pop	r0
+ 1d6:	0f be       	out	0x3f, r0	; 63
+ 1d8:	0f 90       	pop	r0
+ 1da:	1f 90       	pop	r1
+ 1dc:	18 95       	reti
 
-0000012e <_exit>:
- 12e:	f8 94       	cli
+000001de <__vector_1>:
 
-00000130 <__stop_program>:
- 130:	ff cf       	rjmp	.-2      	; 0x130 <__stop_program>
+ISR(INT0_vect)
+{
+ 1de:	1f 92       	push	r1
+ 1e0:	0f 92       	push	r0
+ 1e2:	0f b6       	in	r0, 0x3f	; 63
+ 1e4:	0f 92       	push	r0
+ 1e6:	11 24       	eor	r1, r1
+	
+}
+ 1e8:	0f 90       	pop	r0
+ 1ea:	0f be       	out	0x3f, r0	; 63
+ 1ec:	0f 90       	pop	r0
+ 1ee:	1f 90       	pop	r1
+ 1f0:	18 95       	reti
+
+000001f2 <__vector_2>:
+
+ISR(INT1_vect)
+{
+ 1f2:	1f 92       	push	r1
+ 1f4:	0f 92       	push	r0
+ 1f6:	0f b6       	in	r0, 0x3f	; 63
+ 1f8:	0f 92       	push	r0
+ 1fa:	11 24       	eor	r1, r1
+	
+ 1fc:	0f 90       	pop	r0
+ 1fe:	0f be       	out	0x3f, r0	; 63
+ 200:	0f 90       	pop	r0
+ 202:	1f 90       	pop	r1
+ 204:	18 95       	reti
+
+00000206 <_exit>:
+ 206:	f8 94       	cli
+
+00000208 <__stop_program>:
+ 208:	ff cf       	rjmp	.-2      	; 0x208 <__stop_program>
