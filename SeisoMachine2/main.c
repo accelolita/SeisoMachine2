@@ -25,7 +25,7 @@ void Set7Seg(unsigned char num,unsigned char dot);
 int main(void)
 {
 
-	//ポートB　2 3 GP F 青 G　
+	//ポートB　2 3 GP F 青 G
 	DDRB= 
 	  (1<<DDB7) //PB7 7seg_2
 	| (1<<DDB6) //PB6 7seg_3
@@ -92,16 +92,38 @@ int main(void)
 	OCR0B=255;
 	OCR1A=0;
 	
+
+	unsigned char i=0;
 	sei();
     while (1) 
     {
+		_delay_ms(1000);
+		roopup(i,0,9);
+		Set7Seg(i,1);
     }
 }
 
 void Set7Seg(unsigned char num,unsigned char dot)
 {
-
+	const char seg[10]=  //0bGFEDCBAP
+	{
+		0b10000001,//0
+		0b11110011,//1
+		0b01001001,//2
+		0b01100001,//3
+		0b00110011,//4
+		0b00100101,//5
+		0b00000101,//6
+		0b10110001,//7
+		0b00000001,//8
+		0b00100001,//9
+	};
+	
+	PORTC=(PORTC & 0b11000001) | (seg[num] & 0b00111110);
+	PORTB=(PORTB & 0b11110010) | ((seg[num]& 0x80)>>7) | ((seg[num] & 0x40)>>4) | ((dot & 0x01)<<3); 
 }
+
+
 
 ISR(TIMER2_COMPA_vect)
 {
