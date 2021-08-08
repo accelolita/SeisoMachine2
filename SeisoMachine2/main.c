@@ -16,11 +16,12 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-
-
 #define PlaySound(x) dfCommand[6]=x;SendCommand(&dfCommand[0],(unsigned char)0x08);
 
 void Set7Seg(unsigned char num,unsigned char dot);
+uint16_t trackNum=500;
+unsigned char trackDigit[4];
+void SetTrackNumber(uint16_t num);
 
 int main(void)
 {
@@ -54,7 +55,7 @@ int main(void)
 	| (0<<DDD1) //PD1 UART TX
 	| (0<<DDD0);//PD0 UART RX
 	
-	PORTD|=0b10000000;
+	PORTD|=0b10001100;
 	
 	//8bitタイマーカウンタ０//PWM
 	TCCR0A= (0b11<<COM1A0)	//高速PWM比較A反転出力
@@ -75,16 +76,16 @@ int main(void)
 	| (0b10<<WGM20);		//比較一致ﾀｲﾏ
 	TCCR2B= (0b1<<WGM22)	//比較一致ﾀｲﾏ
 	| (0b111<<CS20);		//1024分周　78.125Hz
-	OCR2A=40;				//ダイナミック点灯周期
+	OCR2A=30;				//ダイナミック点灯周期
 	OCR2B=0xFF;				//ロータリーエンコーダーゲーミング周期
 	TIMSK2=1<<OCIE2A;		//タイマー2A割込み許可
 	//PORTB|=0b00000000;
 	
 	//外部割込み
-	EICRA= 0b01<<ISC10		//INT1 両端割込み
-	| 0b01<<ISC00;			//INT0 両端割込み
-	EIMSK=1<<INT0			//INT0 割込み許可
-	| 0b01<<INT1;				//INT1 割込み許可
+	EICRA= 0b10<<ISC10		//INT1 下降端割込み
+	| 0b10<<ISC00;			//INT0 下降端割込み
+	EIMSK=0<<INT0			//INT0 割込み許可
+	| 0<<INT1;				//INT1 割込み許可
 			
 		
 	//ゲーミングロータリーエンコーダ初期設定
@@ -92,14 +93,55 @@ int main(void)
 	OCR0B=255;
 	OCR1A=0;
 	
-
-	unsigned char i=0;
+	SetTrackNumber(trackNum);
+	unsigned char abStatus=0;
 	sei();
     while (1) 
     {
-		_delay_ms(1000);
-		roopup(i,0,9);
-		Set7Seg(i,1);
+		//countup
+		if ((PIND & 0x0C) == 0x08 && abStatus==0)
+		{
+			abStatus=1;
+		}
+		if (((PIND & 0x0C) == 0x00) && abStatus==1)
+		{
+			abStatus=2;
+		}
+		if (((PIND & 0x0C) == 0x04) && abStatus==2)
+		{
+			abStatus=3;
+		}
+		if (((PIND & 0x0C) == 0x0C) && abStatus==3)
+		{
+			SetTrackNumber(++trackNum);
+			if (trackNum>9999)
+			{
+				SetTrackNumber(1);
+			}		
+			abStatus=0;
+		}
+		//countdown
+		if ((PIND & 0x0C) == 0x04 && abStatus==0)
+		{
+			abStatus=4;
+		}
+		if (((PIND & 0x0C) == 0x00) && abStatus==4)
+		{
+			abStatus=5;
+		}
+		if (((PIND & 0x0C) == 0x08) && abStatus==5)
+		{
+			abStatus=6;
+		}
+		if (((PIND & 0x0C) == 0x0C) && abStatus==6)
+		{
+			SetTrackNumber(--trackNum);
+			if (trackNum<1)
+			{
+				SetTrackNumber(9999);
+			}
+			abStatus=0;
+		}
     }
 }
 
@@ -120,7 +162,18 @@ void Set7Seg(unsigned char num,unsigned char dot)
 	};
 	
 	PORTC=(PORTC & 0b11000001) | (seg[num] & 0b00111110);
-	PORTB=(PORTB & 0b11110010) | ((seg[num]& 0x80)>>7) | ((seg[num] & 0x40)>>4) | ((dot & 0x01)<<3); 
+	PORTB=(PORTB & 0b11110010) | ((seg[num]& 0x80)>>7) | ((seg[num] & 0x40)>>4) | ((~dot & 0x01)<<3); 
+}
+
+void SetTrackNumber(uint16_t num)
+{
+	trackNum=num;
+	trackDigit[0]=num/1000;
+	num-=1000*trackDigit[0];
+	trackDigit[1]=num/100;
+	num-=100*trackDigit[1];
+	trackDigit[2]=num/10;
+	trackDigit[3]=num-10*trackDigit[2];
 }
 
 
@@ -137,16 +190,28 @@ ISR(TIMER2_COMPA_vect)
 	switch (digit)
 	{
 		case 0:
+		PORTC|=0b00111110;
+		PORTB|=0b00001101;
 		sbi(PORTD,PD7);
+		Set7Seg(trackDigit[0],0);
 		break;
 		case 1:
+		PORTC|=0b00111110;
+		PORTB|=0b00001101;		
 		sbi(PORTB,PB7);
+		Set7Seg(trackDigit[1],0);
 		break;
 		case 2:
+		PORTC|=0b00111110;
+		PORTB|=0b00001101;		
 		sbi(PORTB,PB6);
+		Set7Seg(trackDigit[2],0);
 		break;
 		case 3:
+		PORTC|=0b00111110;
+		PORTB|=0b00001101;		
 		sbi(PORTD,PD4);
+		Set7Seg(trackDigit[3],0);
 		break;
 		default:
 		/* Your code here */
@@ -194,12 +259,42 @@ ISR(TIMER2_COMPA_vect)
 	}
 }
 
-ISR(INT0_vect)
-{
-	
-}
+char rnStatus=0;
 
-ISR(INT1_vect)
-{
-	
-}
+//ISR(INT0_vect)
+//{
+	//EIMSK&=~(1<<INT0);
+	//if (rnStatus==0 && (PIND & (1<<PIND3)))
+	//{
+		//rnStatus=1;//countdown
+	//}
+	//if (rnStatus==2 && (~PIND & (1<<PIND2)))
+	//{
+		//SetTrackNumber(++trackNum);
+		//if (trackNum>9999)
+		//{
+			//SetTrackNumber(1);
+		//}
+		//rnStatus=0;
+		//EIMSK|=1<<INT1;
+	//}		
+//}
+//
+//ISR(INT1_vect)
+//{
+	//EIMSK&=~(1<<INT1);
+	//if (rnStatus==0 && (PIND & (1<<PIND2)))
+	//{
+		//rnStatus=2;//countdown
+	//}
+	//if (rnStatus==1 && (~PIND & (1<<PIND2)))
+	//{
+		//SetTrackNumber(--trackNum);
+		//if (trackNum<1)
+		//{
+			//SetTrackNumber(9999);
+		//}
+		//rnStatus=0;
+		//EIMSK|=1<<INT0;
+	//}
+//}
