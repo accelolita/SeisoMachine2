@@ -16,10 +16,13 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#define PlaySound(x) dfCommand[6]=x;SendCommand(&dfCommand[0],(unsigned char)0x08);
+char dfCommand[8]={0x7E,0xFF,0x06,0x03,0x00,0x00,0x01,0xEF};//ルートディレクトリの1番目の曲再生
+
+void SendCommand(char* str,unsigned char num);
+void PlaySound(int16_t x);
 
 void Set7Seg(unsigned char num,unsigned char dot);
-uint16_t trackNum=500;
+uint16_t trackNum=1;
 unsigned char trackDigit[4];
 void SetTrackNumber(uint16_t num);
 
@@ -79,26 +82,28 @@ int main(void)
 	OCR2A=30;				//ダイナミック点灯周期
 	OCR2B=0xFF;				//ロータリーエンコーダーゲーミング周期
 	TIMSK2=1<<OCIE2A;		//タイマー2A割込み許可
-	//PORTB|=0b00000000;
-	
-	//外部割込み
-	EICRA= 0b10<<ISC10		//INT1 下降端割込み
-	| 0b10<<ISC00;			//INT0 下降端割込み
-	EIMSK=0<<INT0			//INT0 割込み許可
-	| 0<<INT1;				//INT1 割込み許可
-			
 		
 	//ゲーミングロータリーエンコーダ初期設定
 	OCR0A=0;
 	OCR0B=255;
 	OCR1A=0;
 	
+	//UART ボーレート設定
+	UBRR0H=0;
+	UBRR0L=51;//9615bps
+	//UART設定
+	UCSR0A=0x00;			//5bit 送信可能フラグ
+	UCSR0B= 1<<TXEN0		//送信許可
+	| 1<<RXEN0;				//受信許可
+	UCSR0C=0b11<<UCSZ00;	//データ8ビット　stop 1bit パリティなし 非同期
+
+
 	SetTrackNumber(trackNum);
 	unsigned char abStatus=0;
 	sei();
     while (1) 
     {
-		//countup
+		//count up
 		if ((PIND & 0x0C) == 0x08 && abStatus==0)
 		{
 			abStatus=1;
@@ -141,6 +146,11 @@ int main(void)
 				SetTrackNumber(9999);
 			}
 			abStatus=0;
+		}
+		//スイッチ
+		if (PINC & 0x01)
+		{
+			PlaySound(trackNum);
 		}
     }
 }
@@ -259,42 +269,19 @@ ISR(TIMER2_COMPA_vect)
 	}
 }
 
-char rnStatus=0;
+void SendCommand(char* str,unsigned char num)
+{
+	for (char i=0;i<num;i++)
+	{
+		while(!(UCSR0A & 0b00100000));
+		UDR0=*str;
+		str++;
+	}
+}
 
-//ISR(INT0_vect)
-//{
-	//EIMSK&=~(1<<INT0);
-	//if (rnStatus==0 && (PIND & (1<<PIND3)))
-	//{
-		//rnStatus=1;//countdown
-	//}
-	//if (rnStatus==2 && (~PIND & (1<<PIND2)))
-	//{
-		//SetTrackNumber(++trackNum);
-		//if (trackNum>9999)
-		//{
-			//SetTrackNumber(1);
-		//}
-		//rnStatus=0;
-		//EIMSK|=1<<INT1;
-	//}		
-//}
-//
-//ISR(INT1_vect)
-//{
-	//EIMSK&=~(1<<INT1);
-	//if (rnStatus==0 && (PIND & (1<<PIND2)))
-	//{
-		//rnStatus=2;//countdown
-	//}
-	//if (rnStatus==1 && (~PIND & (1<<PIND2)))
-	//{
-		//SetTrackNumber(--trackNum);
-		//if (trackNum<1)
-		//{
-			//SetTrackNumber(9999);
-		//}
-		//rnStatus=0;
-		//EIMSK|=1<<INT0;
-	//}
-//}
+void PlaySound(int16_t x)
+{
+	dfCommand[5]=(char)(x>>8);
+	dfCommand[6]=(char)(x & 0xFF);
+	SendCommand(&dfCommand[0],(unsigned char)0x08);
+}
